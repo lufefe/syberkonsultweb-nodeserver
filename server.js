@@ -1,21 +1,32 @@
-const express = require('express')
-const cors = require('cors')
-const axios = require('axios')
-const app = express()
-const port = 8000
+var express = require('express'),
+  bodyParser = require('body-parser'),
+  app = express(),
+  port = process.env.PORT || 4000;
 
-app.use(cors())
-app.use(express.json())
+var fetch = require('node-fetch');
 
-app.post('/verify', async (request, response) => {
-  const { captchaValue } = request.body
-  const { data } = await axios.post(
-    `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SITE_SECRET}&response=${captchaValue}`,
-  )
-  response.send(data)
-})
+// enable CORS using npm package
+var cors = require('cors');
+app.use(cors());
 
-//todo : remove before pushing to production
+// parse application/json
+app.use(bodyParser.json());
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({ extended: true }));
+
+// verify reCAPTCHA response
+app.post('/verify', (req, res) => {
+  var VERIFY_URL = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.SECRET_KEY}&response=${req.body['g-recaptcha-response']}`;
+  return fetch(VERIFY_URL, { method: 'POST' })
+    .then(res => res.json())
+    .then(json => res.send(json));
+});
+
+// request handlers
+app.get('/', (req, res) => {
+  res.status(200).json({ message: 'Hi There, @SyberKonsult' });
+});
+
 app.listen(port, () => {
-  console.log(`Server listening at ${port}`)
-})
+  console.log('Server started on: ' + port);
+});
