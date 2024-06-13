@@ -3,7 +3,8 @@ var express = require('express'),
   app = express(),
   port = process.env.PORT || 4000;
 
-var fetch = require('node-fetch');
+  import fetch from "node-fetch";
+// var fetch = require('node-fetch');
 
 // enable CORS using npm package
 var cors = require('cors');
